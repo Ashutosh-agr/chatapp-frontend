@@ -683,11 +683,11 @@ export default function ChatPage() {
       }
       // Only show toast if chatId is different from the previous one
       if (selectedChatId !== chatId) {
-        toast({
-          title: "Chat ID generated",
-          description: `Chat ID: ${chatId}`,
-          duration: 2000,
-        })
+        // toast({
+        //   title: "Chat ID generated",
+        //   description: `Chat ID: ${chatId}`,
+        //   duration: 2000,
+        // })
       }
       setSelectedChatId(chatId)
       // Fetch chat history from backend

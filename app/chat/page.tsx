@@ -48,6 +48,10 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const backendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    process.env.VITE_BACKEND_URL ||
+    "http://localhost:8080"
   // Logout handler
   // Store the number of contacts fetched
   const [contactsCount, setContactsCount] = useState(0)
@@ -102,16 +106,13 @@ export default function ChatPage() {
     formData.append("file", file)
     // Only upload file, do not update messages here; rely on WebSocket for message delivery
     try {
-      const res = await fetch(
-        "http://localhost:8080/api/v1/messages/upload-media",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      )
+      const res = await fetch(`${backendUrl}/api/v1/messages/upload-media`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
       if (!res.ok) throw new Error("Failed to upload file")
       toast({
         title: "File uploaded",
@@ -143,7 +144,7 @@ export default function ChatPage() {
     // Connect only once
     if (stompClientRef.current) return
 
-    const socketUrl = "http://localhost:8080/ws"
+    const socketUrl = `${backendUrl}/ws`
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
       debug: function () {},
@@ -255,7 +256,7 @@ export default function ChatPage() {
       if (!token) return
 
       try {
-        const response = await fetch("http://localhost:8080/api/v1/users", {
+        const response = await fetch(`${backendUrl}/api/v1/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -322,7 +323,7 @@ export default function ChatPage() {
     if (!token || !senderId || contacts.length === 0) return
 
     // Fetch neko images
-    const url = `http://localhost:8080/api/proxy/neko-image?contactsCount=${contacts.length}`
+    const url = `${backendUrl}/api/proxy/neko-image?contactsCount=${contacts.length}`
     const res = await fetch(url)
     const data = await res.json()
     if (!Array.isArray(data) || data.length !== contacts.length) return
@@ -348,14 +349,11 @@ export default function ChatPage() {
 
   const fetchMessages = async (chatId: string, token: string) => {
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/v1/messages/chat/${chatId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const res = await fetch(`${backendUrl}/api/v1/messages/chat/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       if (!res.ok) throw new Error("Failed to fetch messages")
       const data = await res.json()
       return data.map((msg: any) => {
@@ -464,7 +462,7 @@ export default function ChatPage() {
 
     // 2. Persist message via REST API
     try {
-      await fetch("http://localhost:8080/api/v1/messages", {
+      await fetch(`${backendUrl}/api/v1/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -555,7 +553,7 @@ export default function ChatPage() {
         throw new Error("Sender or receiver ID is missing!")
       }
       const res = await fetch(
-        `http://localhost:8080/api/v1/chats?sender_id=${senderId}&receiver_id=${receiverId}`,
+        `${backendUrl}/api/v1/chats?sender_id=${senderId}&receiver_id=${receiverId}`,
         {
           method: "POST",
           headers: {
@@ -644,8 +642,8 @@ export default function ChatPage() {
       // Pass contactsCount as a query parameter to the endpoint
       const url =
         contactsCountParam !== undefined
-          ? `http://localhost:8080/api/proxy/neko-image?contactsCount=${contactsCountParam}`
-          : "http://localhost:8080/api/proxy/neko-image"
+          ? `${backendUrl}/api/proxy/neko-image?contactsCount=${contactsCountParam}`
+          : `${backendUrl}/api/proxy/neko-image`
       const res = await fetch(url)
       const data = await res.json()
       if (Array.isArray(data) && data.length > 0) {
@@ -695,7 +693,7 @@ export default function ChatPage() {
       setMessages(history)
       // Mark messages as seen
       try {
-        await fetch(`http://localhost:8080/api/v1/messages?chat-id=${chatId}`, {
+        await fetch(`${backendUrl}/api/v1/messages?chat-id=${chatId}`, {
           method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -720,7 +718,7 @@ export default function ChatPage() {
       if (!token) return
 
       try {
-        const response = await fetch("http://localhost:8080/api/v1/users", {
+        const response = await fetch(`${backendUrl}/api/v1/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

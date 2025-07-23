@@ -74,7 +74,11 @@ export default function LoginPage() {
       if (existingToken) {
         headers["Authorization"] = `Bearer ${existingToken}`
       }
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL ||
+        process.env.VITE_BACKEND_URL ||
+        "http://localhost:8080"
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
         headers,
         body: JSON.stringify({email, password}),

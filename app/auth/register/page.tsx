@@ -77,7 +77,11 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL ||
+        process.env.VITE_BACKEND_URL ||
+        "http://localhost:8080"
+      const response = await fetch(`${backendUrl}/api/auth/register`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(formData),

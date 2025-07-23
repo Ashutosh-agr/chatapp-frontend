@@ -20,6 +20,11 @@ import {
 import Link from "next/link"
 import {useToast} from "@/hooks/use-toast"
 
+const backendUrl =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  process.env.VITE_BACKEND_URL ||
+  "http://localhost:8080"
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -77,10 +82,6 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL ||
-        process.env.VITE_BACKEND_URL ||
-        "http://localhost:8080"
       const response = await fetch(`${backendUrl}/api/auth/register`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},

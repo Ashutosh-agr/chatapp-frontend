@@ -1,6 +1,30 @@
 "use client"
 
 import {useState, useEffect, useRef} from "react"
+// Utility to handle 401/403 errors globally
+function handleAuthError(
+  response: Response,
+  router: ReturnType<typeof useRouter>,
+  toast: (opts: {
+    title: string
+    description: string
+    variant?: "destructive" | "message" | "default" | null
+  }) => void
+) {
+  if (response.status === 401 || response.status === 403) {
+    localStorage.removeItem("token")
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("userId")
+    toast({
+      title: "Session expired",
+      description: "Please login again.",
+      variant: "destructive",
+    })
+    router.push("/auth/login")
+    return true
+  }
+  return false
+}
 // Removed nekosapi import; will use direct fetch
 import {Client} from "@stomp/stompjs"
 import SockJS from "sockjs-client"
@@ -261,6 +285,7 @@ export default function ChatPage() {
             Authorization: `Bearer ${token}`,
           },
         })
+        if (handleAuthError(response, router, toast)) return
         if (response.ok) {
           const data = await response.json()
           setContacts(
@@ -354,6 +379,7 @@ export default function ChatPage() {
           Authorization: `Bearer ${token}`,
         },
       })
+      if (handleAuthError(res, router, toast)) return []
       if (!res.ok) throw new Error("Failed to fetch messages")
       const data = await res.json()
       return data.map((msg: any) => {

@@ -362,11 +362,9 @@ export default function ChatPage() {
     setAvatarMap(newAvatarMap)
   }
 
-  // Set default selected contact when contacts are loaded
+  // Fetch avatars for all contacts and map to chatId when contacts are loaded
   useEffect(() => {
     if (contacts.length > 0) {
-      setSelectedContact(contacts[0])
-      // Fetch avatars for all contacts and map to chatId
       fetchNekoImagesForContacts()
       // We'll fetch messages in handleContactSelect
     }
